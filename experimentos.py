@@ -5,7 +5,7 @@ import random
 
 
 class Experimento:
-    def __init__(self, id, receta_id, personas_responsables, fecha, costo_asociado, resultado):
+    def __init__(self, id, receta_id, personas_responsables, fecha, costo_asociado, resultado, veces_hecho):
         
         self.id = id
         self.receta_id = receta_id
@@ -13,6 +13,7 @@ class Experimento:
         self.fecha = fecha
         self.costo_asociado = costo_asociado
         self.resultado = resultado
+        self.veces_hecho = 0
         
     def show_attr(self):
       
@@ -94,112 +95,120 @@ class Experimento:
             return 
     
    
+    def validar_fecha_caducidad(fecha_caducidad):
+      
+        fecha_caducidad = datetime.strptime(fecha_caducidad, '%Y-%m-%d')
+        fecha_actual = datetime.now()
+        if fecha_caducidad >= fecha_actual:
+            return True
+        elif fecha_caducidad < fecha_actual:
+            
+            return False
+        else:
+            print('Formato de fecha incorrecto. Use el formato YYYY-MM-DD.')   
+            return False    
+    
+    def realizar_experimento(experimentos, recetas, reactivos):
 
-    def realizar_experimento(self):
         id_experimento_hacer = input('Ingrese el ID del experimento a realizar: ')
 
         try:
             id_experimento_hacer = int(id_experimento_hacer)
         except ValueError:
-            print('El ID debe ser un número entero')
+            print('El ID debe ser un número entero.')
             return
 
         experimento_encontrado = None
-        for experimento in self.experimento:
-            if experimento.id == id_experimento_hacer:
-                experimento_encontrado = experimento
-                
-
+        for exp in experimentos:
+            if exp.id == id_experimento_hacer:
+                experimento_encontrado = exp
+                break
+           
         if not experimento_encontrado:
             print(f'No se encontró un experimento con el ID {id_experimento_hacer}')
             return
 
-        # Validar fecha de caducidad del experimento
-        try:
-            fecha_caducidad_dt = datetime.strptime(experimento_encontrado.fecha, '%Y-%m-%d')
-            fecha_actual = datetime.now()
-            print(experimento_encontrado.show_attr())
-            if fecha_caducidad_dt < fecha_actual:
-                print('La fecha de caducidad del experimento ya ha pasado, no se puede realizar el experimento')
-                return
-        except ValueError:
-                print('Formato de fecha incorrecto. Use el formato YYYY-MM-DD')
-                return
 
-        # Aumentar el contador de veces que se ha realizado
-        experimento_encontrado['veces_hecho'] += 1
+        experimento_encontrado.veces_hecho += 1
 
-        # Buscar la receta asociada
         receta_encontrada = None
-        for receta in self.recetas_json:
-            if receta.id == experimento_encontrado.id:
-                receta_encontrada = receta
-                
+        for r in recetas:
+            if r.id == experimento_encontrado.id:
+                receta_encontrada = r
+                break
 
         if not receta_encontrada:
-            print(f'No se encontró una receta con ID {experimento_encontrado["receta_id"]}')
+            print(f'No se encontró una receta con ID {experimento_encontrado.id}')
             return
 
-        # Inicializamos el costo total del experimento en 0
-        costo_total_experimento = 0.0
+        costo_total = 0.0
 
-        # Recorrer los reactivos que se usarán en la receta
-        for reactivo_usado in receta_encontrada['reactivos_utilizados']:
+        for reactivo_usado in receta_encontrada.reactivos_utilizados:
             reactivo_id = reactivo_usado['reactivo_id']
             cantidad_necesaria = reactivo_usado['cantidad_necesaria']
             unidad_medida = reactivo_usado['unidad_medida']
 
-            # Buscar el reactivo correspondiente en la lista de reactivos
             reactivo_encontrado = None
-            for reactivo in self.reactivos_json:
-                if reactivo['id'] == reactivo_id:
-                    reactivo_encontrado = reactivo
+            for r in reactivos:
+                if r.id == reactivo_id:
+                    reactivo_encontrado = r
                     break
 
             if not reactivo_encontrado:
-                print(f' No se encontró un reactivo con ID {reactivo_id}')
+                print(f'No se encontró un reactivo con ID {reactivo_id}')
                 continue
 
-            # Simular el error de 0.1% a 22.5% (0.001 a 0.225 en valor decimal)
+            fecha_caducidad = reactivo_encontrado.fecha_caducidad
+        
+            if not Experimento.validar_fecha_caducidad(fecha_caducidad):
+                print('La fecha de caducidad del experimento ya se vencio no se puede realizar')
+                return
+
             error = random.uniform(0.001, 0.225)
             cantidad_errada = cantidad_necesaria * error
-            
-            # Calculamos la cantidad TOTAL que se consumirá de este reactivo
-            # (cantidad necesaria + cantidad por el error)
-            if reactivo_encontrado['unidad_medida'] == unidad_medida:
-                # Misma unidad, no hay conversión
+
+            if reactivo_encontrado.unidad_medida == unidad_medida:
                 cantidad_total_consumida = cantidad_necesaria + cantidad_errada
             else:
-                # Hay que buscar la conversión
-                conversion_encontrada = None
-                for conversion in reactivo_encontrado['conversiones_posibles']:
-                    if conversion['unidad'] == unidad_medida:
-                        conversion_encontrada = conversion
+                conversion_obj = None
+                for c in reactivo_encontrado.conversiones_posibles:
+                    if c['unidad'] == unidad_medida:
+                        conversion_obj = c
                         break
-                if not conversion_encontrada:
-                    print(f'ERROR: No se encontró una conversión para la unidad {unidad_medida}.')
+
+                if not conversion_obj:
+                    print(f'No se encontró una conversión para la unidad {unidad_medida}.')
                     continue
-                # Ajustar la cantidad necesaria a la unidad base del reactivo
-                # (por ejemplo, si factor = 1000, significa que 1 kg = 1000 g)
-                cantidad_convertida = cantidad_necesaria / conversion_encontrada['factor']
-                
-                # Asumimos el mismo factor se aplica al 'error' o que ya está medido
-                cantidad_errada_convertida = (cantidad_necesaria * error) / conversion_encontrada['factor']
+
+                cantidad_convertida = cantidad_necesaria / conversion_obj['factor']
+                cantidad_errada_convertida = (cantidad_necesaria * error) / conversion_obj['factor']
                 cantidad_total_consumida = cantidad_convertida + cantidad_errada_convertida
 
-            # Descontar el inventario disponible
-            reactivo_encontrado['inventario_disponible'] -= cantidad_total_consumida
+            reactivo_encontrado.inventario_disponible -= cantidad_total_consumida
 
-            # Calcular el costo parcial = cantidad consumida * costo unitario
-            # 'costo' asumimos que está en la misma unidad base que el inventario.
-            costo_unitario = reactivo_encontrado.get('costo', 0.0)
+            costo_unitario = reactivo_encontrado.costo
             costo_parcial = cantidad_total_consumida * costo_unitario
+            costo_total += costo_parcial
 
-            # Acumular en el costo total
-            costo_total_experimento += costo_parcial
+        experimento_encontrado.costo_asociado += costo_total
 
-        # Al finalizar, guardamos el costo en el experimento (si así lo deseas) 
-        experimento_encontrado['costo_total'] = costo_total_experimento
+        print("Experimento realizado exitosamente.")
+        print(f"El costo adicional sumado a este experimento es: {costo_total:.2f}")
+        print(f"Costo total acumulado para este experimento: {experimento_encontrado.costo_asociado:.2f}")
 
-        print('Experimento realizado exitosamente.')
-        print(f'El costo total del experimento es: {costo_total_experimento:.2f}')
+    #     # 8) Guardar la lista de experimentos en un .txt (contenido JSON)
+    #     guardar_experimentos_json(experimentos)
+
+
+    # def guardar_experimentos_json(experimentos, nombre_archivo="experimentos.txt"):
+    #     """
+    #     Convierte la lista de objetos Experimento a dict y la guarda en un archivo TXT usando JSON.
+    #     """
+    #     # Convertir cada Experimento en dict
+    #     lista_experimentos_dict = [exp.to_dict() for exp in experimentos]
+
+    #     # Guardarlo en un archivo
+    #     with open(nombre_archivo, "w", encoding="utf-8") as f:
+    #         json.dump(lista_experimentos_dict, f, indent=4, ensure_ascii=False)
+
+    #     print(f"Los experimentos se han guardado en {nombre_archivo} con formato JSON.")

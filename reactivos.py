@@ -9,7 +9,7 @@ class Reactivo:
         self.categoria=categoria
         self.inventario_disponible=inventario_disponible
         self.unidad_medida=unidad_medida
-        self.fecha_caducidad= datetime.strptime(fecha_caducidad, "%Y-%m-%d")
+        self.fecha_caducidad= fecha_caducidad
         self.minimo_sugerido=minimo_sugerido
         self.conversiones_posibles=conversiones_posibles
         
@@ -25,10 +25,8 @@ class Reactivo:
         print(f"Unidad de Medida: {self.unidad_medida}")
         print(f"Fecha de Caducidad: {self.fecha_caducidad}")
         print(f"Mínimo Sugerido: {self.minimo_sugerido}")
-        print("Conversiones posibles:")
-        for i in self.conversiones_posibles:
-            for unidad, factor in i.items():
-                print(f"{unidad}: {factor}")
+        print(f"Conversiones posibles: {self.conversiones_posibles}")
+       
         print("\n")
 
 
@@ -80,19 +78,7 @@ class Reactivo:
                 reactivo.editar_atributo(atributo, nuevo_valor)
                 return
             print(f'No se encontró un reactivo con id: {id}')
-                
-    # def eliminar(self, lista_reactivos):
-        
-
-    #     id_eliminar = int(input("introduce el id del reactivo que deseas eliminar: "))
-    #     for reactivo in lista_reactivos:
-    #         if reactivo.id == id_eliminar:
-    #             lista_reactivos.remove(reactivo)
-    #             print(f"Experimento ({id_eliminar}) eliminado correctamente.\n")
-    #             return 
-    #         else:
-    #             print("ID no encontrado.\n")
-    #             return 
+          
     
     def eliminar(self, lista_reactivos):
         

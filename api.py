@@ -89,7 +89,7 @@ class App():
                 if pregunta_experimento == "1":
                     
                     
-                    Experimento.realizar_experimento()
+                    Experimento.realizar_experimento(self.experimento, self.recetas, self.reactivos)
                     
                     
                 elif pregunta_experimento == "2":

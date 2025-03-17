@@ -6,7 +6,7 @@ from reactivos import Reactivo
 from experimentos import Experimento
 from datetime import datetime
 import random
-
+import json
 
 
 class App():
@@ -42,7 +42,7 @@ class App():
 
               """)
             
-            pregunta1 = (input("¿Que opcion desea realizar? \n1-Mostrar Reactivos \n2-Mostrar Experimentos \n3-Mostrar Recetas \n4-Ver estadisticas \n5-Salir \n->"))
+            pregunta1 = (input("¿Que opcion desea realizar? \n1-Mostrar Reactivos \n2-Mostrar Experimentos \n3-Mostrar Recetas \n4-Ver estadisticas \n5-Cargar datos \n6-Salir \n->"))
             
             if pregunta1 == "1":
                 
@@ -50,7 +50,7 @@ class App():
                     i.show_attr()
                     
                     
-                pregunta_reactivo = input("¿Que quieres hacer en reactivos? \n1-Crear Reactivo \n2-Editar Reactivo \n3-Eliminar reactivo \n4-Ver fecha de caducidad \n5-Atras \n->")
+                pregunta_reactivo = input("¿Que quieres hacer en reactivos? \n1-Crear Reactivo \n2-Editar Reactivo \n3-Eliminar reactivo \n4-Atras \n->")
                     
                 if pregunta_reactivo == "1":
                         
@@ -66,17 +66,7 @@ class App():
                     Reactivo.eliminar(self, lista_reactivos)
                 
                 elif pregunta_reactivo == "4":
-                    
-                    print("Fechas de caducidad: \n")
-                    for reactivo in self.reactivos:
-                        if reactivo.esta_vencido():
-                            print(f"- {reactivo.nombre} vencio el {reactivo.fecha_caducidad.date()}")
-                        else:
-                            print(f"- {reactivo.nombre} vence en {reactivo.dias_para_vencer()} días")
-                            
-                            
-                elif pregunta1 == "5":
-                    
+                           
                     pass
                         
             elif pregunta1 == "2":
@@ -89,7 +79,7 @@ class App():
                 if pregunta_experimento == "1":
                     
                     
-                    Experimento.realizar_experimento(self.experimento, self.recetas, self.reactivos)
+                    Experimento.realizar_experimento( self.experimento, self.recetas, self.reactivos)
                     
                     
                 elif pregunta_experimento == "2":
@@ -118,8 +108,11 @@ class App():
                 
                 pass
             
-            
             elif pregunta1 == "5":
+                
+                pass
+            
+            elif pregunta1 == "6":
                 
                 print("¡Nos vemos pronto!")
                 break

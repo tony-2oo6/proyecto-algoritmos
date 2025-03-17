@@ -67,9 +67,9 @@ class Reactivo:
             if reactivo.nombre == nombre:
                 if hasattr(reactivo, atributo):
                     setattr(reactivo, atributo, nuevo_valor)
-                    print(f'Atributo "{atributo}" del experimento "{nombre}" actualizado a "{nuevo_valor}"')
+                    print(f'Atributo "{atributo}" del reactivo "{nombre}" actualizado a "{nuevo_valor}"')
                 else:
-                    print(f'El atributo "{atributo}" no existe en el experimento "{nombre}"')
+                    print(f'El atributo "{atributo}" no existe en el reactivo "{nombre}"')
                 return
         print(f'No se encontró un reactivo con el nombre "{nombre}"')
 
@@ -91,16 +91,6 @@ class Reactivo:
                 return  
     
             print("ID no encontrado.\n")
-
-    
-        
-    def esta_vencido(self):
-        if datetime.now() > self.fecha_caducidad:
-            print(f"El reactivo {self.nombre} esta vencido")
-
-    def dias_para_vencer(self):
-        diferencia = self.fecha_caducidad - datetime.now()
-        return diferencia.days
         
         
     def verificar_inventario_min(self, minimo):
@@ -108,53 +98,6 @@ class Reactivo:
             if reactivo.inventario < minimo:
                 print(f"¡Advertencia! El reactivo {reactivo.nombre} está por debajo del mínimo.")
                 
-    def cambiar_medida(self,lista_reactivos):
+    def cambiar_medida(self,):
         pass
-    #     k = int(input("Ingrese el número del reactivo a editar: "))
-
-    #     if 1 <= k <= len(lista_reactivos):  
-    #         reactivo_a_convertir = lista_reactivos[k - 1]  
-
-    #         print(f"\n **Unidades de Conversión Disponibles para {reactivo_a_convertir['nombre']}:**")
-            
-            
-    #         for conversion in reactivo_a_convertir["conversiones_posibles"]:
-    #             print(f"- {reactivo_a_convertir['unidad_medida']} → {conversion['unidad']} (Factor: {conversion['factor']})")
-            
-    #     else:
-    #         print("⚠️ Número de reactivo inválido. Inténtelo de nuevo.")
-
-
-        #     medida = float(input("introduce la cantidad actual de reactivo"))
-        #     conversion = input("A cual unidad quiere convertir la medida: \n1-ml \n2-l \n3-g \n4-kg ")
-            
-        #     if conversion == "1":
-                
-        #         conversion_L_a_ml = medida * 1000/1
-                
-        #         print(f"la conversion final es: {conversion_L_a_ml}")
-                
-                
-        #     elif conversion =="2":
-                
-        #         conversion_ml_a_L = medida * 1/1000
-        #         print(f"la nueva conversion es: {conversion_ml_a_L}")
-                
-        #     elif conversion =="3":
-                
-        #         conversion_g_a_kg = medida * 1/1000
-                
-        #         print(f"la nueva conversion es: {conversion_g_a_kg}")
-            
-        #     elif conversion =="4":
-            
-        #         conversion_kg_a_g = medida * 1000/1
-                
-        #         print(f"la nueva conversion es: {conversion_kg_a_g}")
-                
-        # else:
-        #     print("Error el numero no puede ser negativo")
-        #     pass
-            
-            
-      
+   
